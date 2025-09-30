@@ -1,0 +1,95 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15.3
+    container_name: intercred-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-intercred_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-intercred_pass}
+      POSTGRES_DB: ${DB_NAME:-intercred}
+    ports:
+      - "5432:5432"
+    volumes:
+      - intercred-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-intercred_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile.backend
+    container_name: intercred-backend
+    restart: unless-stopped
+    env_file:
+      - ../env/.env
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${DB_NAME:-intercred}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-intercred_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-intercred_pass}
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_LOCATIONS: classpath:database/sql
+      LOGGING_FILE_PATH: /logs
+      LOGGING_FILE_NAME: /logs/intercred-backend.log
+      LOGGING_FORMAT: json
+      SWAGGER_ENABLED: "true"
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - intercred-backend-logs:/logs
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile.frontend
+    container_name: intercred-frontend
+    restart: unless-stopped
+    env_file:
+      - ../frontend/.env
+    environment:
+      VITE_API_BASE_URL: http://localhost:8080
+      VITE_CORS_ALLOWED_ORIGINS: http://localhost:5173
+      NODE_ENV: production
+    ports:
+      - "4173:80"
+    depends_on:
+      - backend
+
+volumes:
+  intercred-db-data:
+  intercred-backend-logs:
+
+networks:
+  default:
+    name: intercred-net
+
+# ===================================================================
+# Intercred Modernization - docker-compose.yml
+# - Backend: Java 21 + Spring Boot (Maven, REST, JPA, Flyway, OpenAPI)
+# - Frontend: React + TypeScript (Vite, React Hook Form + Zod)
+# - Database: PostgreSQL 15.3
+# - Logs: /logs (backend), _temp/logs/ (dev)
+# - Env: ../env/.env, ../frontend/.env
+# - Build: mvn clean verify (backend), npm run build (frontend)
+# - Test: JUnit5 + Testcontainers (backend), Vitest (frontend)
+# - API: see backend/src/main/resources/swagger.yaml
+# - For details: see infrastructure/README.md, MATRIZ_EQUIVALENCIA.md
+# ===================================================================
+# Usage:
+#   docker compose -f infrastructure/docker-compose.yml up --build
+#   docker compose -f infrastructure/docker-compose.yml down
+#   docker compose logs -f backend
+#   docker compose exec db psql -U intercred_user intercred
+# ===================================================================
+# For local dev, see README.md and infrastructure/README.md
+# ===================================================================

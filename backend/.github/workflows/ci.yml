@@ -1,0 +1,127 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
+      - 'backend/.github/workflows/ci.yml'
+    branches: [main, develop, dev, feature/**, bugfix/**]
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
+      - 'backend/.github/workflows/ci.yml'
+    branches: [main, develop, dev, feature/**, bugfix/**]
+
+env:
+  JAVA_VERSION: 21
+  MAVEN_OPTS: -Dmaven.repo.local=.m2/repository
+
+jobs:
+  lint:
+    name: Lint (Checkstyle/Spotless)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+
+      - name: Lint (Checkstyle)
+        run: mvn checkstyle:check
+
+      - name: Lint (Spotless)
+        run: mvn spotless:check
+
+  test:
+    name: Unit & Integration Tests (JUnit/Testcontainers)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:15.3
+        env:
+          POSTGRES_USER: intercred_user
+          POSTGRES_PASSWORD: intercred_pass
+          POSTGRES_DB: intercred
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U intercred_user" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+
+      - name: Build & Test (with coverage)
+        run: mvn clean verify
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/target/site/jacoco
+
+  build:
+    name: Build Backend (Maven)
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'maven'
+
+      - name: Build (Maven)
+        run: mvn clean package -DskipTests=false
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-target
+          path: backend/target
+
+  # Optionally, add a job for API contract validation (swagger.yaml) here
+
+  # Optionally, add a job for deploy (manual/auto) here
+
+# Notes:
+# - This workflow is for the Java 21 + Spring Boot backend (Maven).
+# - Lint, test, and build are all required for a green pipeline.
+# - Test job uses PostgreSQL service for integration tests (Testcontainers).
+# - Coverage is uploaded as an artifact for later inspection.
+# - Build output is uploaded as an artifact for deployment or further steps.
+# - See infrastructure/README.md for Docker and local dev instructions.
+# - See MATRIZ_EQUIVALENCIA.md for mapping Delphi → React/Java.
+# - For frontend CI, see frontend/.github/workflows/ci.yml
+# - For environment variables, see env/.env.example
+# - For migration/architecture notes, see README.md and MATRIZ_EQUIVALENCIA.md
+# - For test coverage requirements, see business rule and README.md
+# - For further customization, see pom.xml and application.yml
+
+# End of file
