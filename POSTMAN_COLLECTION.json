@@ -1,0 +1,262 @@
+{
+  "info": {
+    "name": "Intercred Modernization API",
+    "description": "Coleção Postman para testes dos principais endpoints REST da modernização Intercred (Delphi → Java 21/Spring Boot + React).\n\n- Backend: Java 21, Spring Boot, JPA, MapStruct, OpenAPI, Flyway, JWT\n- Frontend: React + TypeScript, Vite, React Hook Form + Zod\n- Para equivalência Delphi → Java/React, veja MATRIZ_EQUIVALENCIA.md\n- Para exemplos de uso, consulte swagger.yaml e esta coleção\n\n**Regras de mapeamento:**\n- Forms/Frames/Actions (Delphi) → frontend/src/pages/ e frontend/src/components/\n- DataModules/Queries → backend/src/main/java/com/intercred/repository/ e service/\n- Regras de tela → backend/service/; controladores finos em controller/\n- Tipagem/records → domain/, model/, enums, datas (java.time)\n- Tratamento de erros → exception/ (Problem Details RFC7807)\n- Utilidades comuns → util/\n- Relatórios antigos → endpoints REST + export (CSV/PDF stub)\n\n**Build:**\n- Backend: mvn clean verify (gera /backend/target/)\n- Frontend: npm run build (gera /frontend/dist)\n\n**Infra:**\n- Docker Compose: infrastructure/docker-compose.yml\n- Variáveis: env/.env.example, frontend/.env.example\n\n**Testes:**\n- Backend: JUnit5 + Testcontainers\n- Frontend: Vitest + React Testing Library\n\n**Documentação:**\n- OpenAPI: backend/src/main/resources/swagger.yaml\n- Matriz de equivalência: MATRIZ_EQUIVALENCIA.md\n- Infra: infrastructure/README.md\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Contrato de Capital de Giro",
+      "item": [
+        {
+          "name": "Listar contratos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contrato-capital-giro",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contrato-capital-giro"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar contrato por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contrato-capital-giro/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contrato-capital-giro", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar contrato",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroContrato\": \"12345\",\n  \"cedenteId\": 1,\n  \"produtoId\": 1,\n  \"dataOperacao\": \"2024-06-01\",\n  \"valorReferencia\": 1000.00,\n  \"valorFinanciado\": 900.00,\n  \"valorLiquido\": 850.00,\n  \"taxaMes\": 2.5,\n  \"taxaEfetiva\": 2.7,\n  \"taxaIOF\": 0.38,\n  \"taxaIOFComplementar\": 0.38,\n  \"valorIOF\": 10.00,\n  \"valorIOFComplementar\": 2.00,\n  \"valorTac\": 5.00,\n  \"valorCustoCobranca\": 3.00,\n  \"valorDoc\": 1.00,\n  \"valorCustoAdministrativo\": 2.00,\n  \"valorOutrasDespesas\": 4.00,\n  \"taxaAberturaCredito\": 0.5,\n  \"totalParcelas\": 12,\n  \"dataPrimeiraParcela\": \"2024-07-01\",\n  \"diasCarencia\": 0,\n  \"parcelasCarencia\": 0,\n  \"tipoPagtoIOF\": \"F\",\n  \"tipoPagtoTac\": \"F\",\n  \"tipoContrato\": \"N\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contrato-capital-giro",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contrato-capital-giro"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar contrato",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroContrato\": \"99999\",\n  \"cedenteId\": 1,\n  \"produtoId\": 1,\n  \"dataOperacao\": \"2024-06-01\",\n  \"valorReferencia\": 2000.00,\n  \"valorFinanciado\": 1800.00,\n  \"valorLiquido\": 1700.00,\n  \"taxaMes\": 2.5,\n  \"taxaEfetiva\": 2.7,\n  \"taxaIOF\": 0.38,\n  \"taxaIOFComplementar\": 0.38,\n  \"valorIOF\": 10.00,\n  \"valorIOFComplementar\": 2.00,\n  \"valorTac\": 5.00,\n  \"valorCustoCobranca\": 3.00,\n  \"valorDoc\": 1.00,\n  \"valorCustoAdministrativo\": 2.00,\n  \"valorOutrasDespesas\": 4.00,\n  \"taxaAberturaCredito\": 0.5,\n  \"totalParcelas\": 24,\n  \"dataPrimeiraParcela\": \"2024-07-01\",\n  \"diasCarencia\": 10,\n  \"parcelasCarencia\": 2,\n  \"tipoPagtoIOF\": \"V\",\n  \"tipoPagtoTac\": \"V\",\n  \"tipoContrato\": \"E\",\n  \"status\": \"ALTERADO\",\n  \"usuarioComercial\": \"user2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contrato-capital-giro/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contrato-capital-giro", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir contrato",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/contrato-capital-giro/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "contrato-capital-giro", ":id"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Empréstimo",
+      "item": [
+        {
+          "name": "Listar empréstimos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emprestimos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emprestimos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar empréstimo por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emprestimos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emprestimos", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar empréstimo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroContrato\": \"EMP-001\",\n  \"cedenteId\": 1,\n  \"produtoId\": 2,\n  \"dataOperacao\": \"2024-06-01\",\n  \"valorReferencia\": 1000.00,\n  \"valorFinanciado\": 900.00,\n  \"valorLiquido\": 850.00,\n  \"taxaMes\": 2.5,\n  \"taxaEfetiva\": 2.7,\n  \"taxaIOF\": 0.38,\n  \"taxaIOFComplementar\": 0.38,\n  \"valorIOF\": 10.00,\n  \"valorIOFComplementar\": 2.00,\n  \"valorTac\": 5.00,\n  \"valorCustoCobranca\": 3.00,\n  \"valorDoc\": 1.00,\n  \"valorCustoAdministrativo\": 2.00,\n  \"valorOutrasDespesas\": 4.00,\n  \"taxaAberturaCredito\": 0.5,\n  \"totalParcelas\": 12,\n  \"dataPrimeiraParcela\": \"2024-07-01\",\n  \"diasCarencia\": 0,\n  \"parcelasCarencia\": 0,\n  \"tipoPagtoIOF\": \"F\",\n  \"tipoPagtoTac\": \"F\",\n  \"tipoContrato\": \"N\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/emprestimos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emprestimos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar empréstimo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroContrato\": \"EMP-999\",\n  \"cedenteId\": 1,\n  \"produtoId\": 2,\n  \"dataOperacao\": \"2024-06-01\",\n  \"valorReferencia\": 2000.00,\n  \"valorFinanciado\": 1800.00,\n  \"valorLiquido\": 1700.00,\n  \"taxaMes\": 2.5,\n  \"taxaEfetiva\": 2.7,\n  \"taxaIOF\": 0.38,\n  \"taxaIOFComplementar\": 0.38,\n  \"valorIOF\": 10.00,\n  \"valorIOFComplementar\": 2.00,\n  \"valorTac\": 5.00,\n  \"valorCustoCobranca\": 3.00,\n  \"valorDoc\": 1.00,\n  \"valorCustoAdministrativo\": 2.00,\n  \"valorOutrasDespesas\": 4.00,\n  \"taxaAberturaCredito\": 0.5,\n  \"totalParcelas\": 24,\n  \"dataPrimeiraParcela\": \"2024-07-01\",\n  \"diasCarencia\": 10,\n  \"parcelasCarencia\": 2,\n  \"tipoPagtoIOF\": \"V\",\n  \"tipoPagtoTac\": \"V\",\n  \"tipoContrato\": \"E\",\n  \"status\": \"ALTERADO\",\n  \"usuarioComercial\": \"user2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/emprestimos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emprestimos", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir empréstimo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emprestimos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emprestimos", ":id"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Simulação de Empréstimo",
+      "item": [
+        {
+          "name": "Listar simulações",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacao-emprestimo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacao-emprestimo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar simulação por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacao-emprestimo/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacao-emprestimo", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar simulação",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroSimulacao\": \"SIM-001\",\n  \"cedenteId\": 1,\n  \"produtoId\": 3,\n  \"dataOperacao\": \"2024-06-01\",\n  \"valorReferencia\": 1000.00,\n  \"valorFinanciado\": 900.00,\n  \"valorLiquido\": 850.00,\n  \"taxaMes\": 2.5,\n  \"taxaEfetiva\": 2.7,\n  \"taxaIOF\": 0.38,\n  \"taxaIOFComplementar\": 0.38,\n  \"valorIOF\": 10.00,\n  \"valorIOFComplementar\": 2.00,\n  \"valorTac\": 5.00,\n  \"valorCustoCobranca\": 3.00,\n  \"valorDoc\": 1.00,\n  \"valorCustoAdministrativo\": 2.00,\n  \"valorOutrasDespesas\": 4.00,\n  \"taxaAberturaCredito\": 0.5,\n  \"totalParcelas\": 12,\n  \"dataPrimeiraParcela\": \"2024-07-01\",\n  \"diasCarencia\": 0,\n  \"parcelasCarencia\": 0,\n  \"tipoPagtoIOF\": \"F\",\n  \"tipoPagtoTac\": \"F\",\n  \"tipoContrato\": \"N\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacao-emprestimo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacao-emprestimo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar simulação",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numeroSimulacao\": \"SIM-999\",\n  \"cedenteId\": 1,\n  \"produtoId\": 3,\n  \"dataOperacao\": \"2024-06-01\",\n  \"valorReferencia\": 2000.00,\n  \"valorFinanciado\": 1800.00,\n  \"valorLiquido\": 1700.00,\n  \"taxaMes\": 2.5,\n  \"taxaEfetiva\": 2.7,\n  \"taxaIOF\": 0.38,\n  \"taxaIOFComplementar\": 0.38,\n  \"valorIOF\": 10.00,\n  \"valorIOFComplementar\": 2.00,\n  \"valorTac\": 5.00,\n  \"valorCustoCobranca\": 3.00,\n  \"valorDoc\": 1.00,\n  \"valorCustoAdministrativo\": 2.00,\n  \"valorOutrasDespesas\": 4.00,\n  \"taxaAberturaCredito\": 0.5,\n  \"totalParcelas\": 24,\n  \"dataPrimeiraParcela\": \"2024-07-01\",\n  \"diasCarencia\": 10,\n  \"parcelasCarencia\": 2,\n  \"tipoPagtoIOF\": \"V\",\n  \"tipoPagtoTac\": \"V\",\n  \"tipoContrato\": \"E\",\n  \"status\": \"ALTERADO\",\n  \"usuarioComercial\": \"user2\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacao-emprestimo/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacao-emprestimo", ":id"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir simulação",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/simulacao-emprestimo/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "simulacao-emprestimo", ":id"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}

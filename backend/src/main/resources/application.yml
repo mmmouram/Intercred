@@ -1,0 +1,211 @@
+# ===================================================================
+# Intercred Modernization - Spring Boot Application Configuration
+# ===================================================================
+# This file defines the main application settings for all environments.
+# Use environment variables or profile-specific files to override as needed.
+# See env/.env.example for variable mapping.
+# ===================================================================
+
+spring:
+  application:
+    name: intercred-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/intercred}
+    username: ${SPRING_DATASOURCE_USERNAME:intercred_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:intercred_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 60000
+      pool-name: IntercredHikariCP
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  flyway:
+    enabled: ${SPRING_FLYWAY_ENABLED:true}
+    locations: ${SPRING_FLYWAY_LOCATIONS:classpath:database/sql}
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  messages:
+    basename: ${SPRING_MESSAGES_BASENAME:messages}
+    encoding: UTF-8
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-binding-errors: always
+    whitelabel:
+      enabled: false
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:INFO}
+    com.intercred: ${LOGGING_LEVEL_COM_INTERCRED:DEBUG}
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: ${LOGGING_PATTERN_CONSOLE:%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n}
+  file:
+    name: ${LOGGING_FILE_NAME:_temp/logs/intercred-backend.log}
+    path: ${LOGGING_FILE_PATH:_temp/logs}
+  logback:
+    rollingpolicy:
+      max-history: 7
+      max-file-size: 10MB
+  format: ${LOGGING_FORMAT:json}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:*}
+  endpoint:
+    health:
+      show-details: ${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS:always}
+  metrics:
+    export:
+      simple:
+        enabled: true
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  allow-credentials: true
+
+# --- Security / Auth ---
+auth:
+  type: ${AUTH_TYPE:jwt}
+  jwt:
+    secret: ${JWT_SECRET:changeme}
+    expiration-ms: ${JWT_EXPIRATION_MS:3600000}
+
+# --- OpenAPI/Swagger ---
+swagger:
+  enabled: ${SWAGGER_ENABLED:true}
+  path: /swagger-ui.html
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+# --- Internationalization ---
+i18n:
+  enabled: true
+  default-locale: pt_BR
+  fallback-to-system-locale: false
+
+# --- File upload (if needed) ---
+# spring.servlet.multipart.max-file-size: 10MB
+# spring.servlet.multipart.max-request-size: 20MB
+
+# --- Custom application properties ---
+intercred:
+  env: ${SPRING_PROFILES_ACTIVE:dev}
+  version: 1.0.0
+  build:
+    timestamp: ${BUILD_TIMESTAMP:unknown}
+  domains:
+    - credito
+    - clientes
+    - contratos
+
+# --- Testcontainers (for tests only) ---
+testcontainers:
+  enabled: true
+
+# --- Additional configuration for production ---
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 4
+  flyway:
+    enabled: true
+  messages:
+    basename: messages,messages_en
+logging:
+  level:
+    root: INFO
+    com.intercred: INFO
+  file:
+    name: /var/log/intercred/intercred-backend.log
+    path: /var/log/intercred
+  format: json
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+
+# --- Additional configuration for development ---
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  jpa:
+    show-sql: true
+  flyway:
+    enabled: true
+logging:
+  level:
+    root: DEBUG
+    com.intercred: DEBUG
+  file:
+    name: _temp/logs/intercred-backend.log
+    path: _temp/logs
+  format: json
+
+# --- Additional configuration for test ---
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:tc:postgresql:15.3:///testdb
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false
+logging:
+  level:
+    root: WARN
+    com.intercred: DEBUG
+  file:
+    name: _temp/logs/intercred-backend-test.log
+    path: _temp/logs
+  format: json
+
+# ===================================================================
+# End of application.yml
+# ===================================================================

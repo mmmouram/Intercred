@@ -1,0 +1,1028 @@
+openapi: 3.0.3
+info:
+  title: Intercred Modernization API
+  description: |
+    API REST para modernização do Intercred (Delphi → Java 21/Spring Boot + React).
+    - Backend: Java 21, Spring Boot, Maven, JPA, MapStruct, OpenAPI, Flyway, JWT.
+    - Frontend: React + TypeScript, Vite, React Hook Form + Zod.
+    - Estrutura: controllers REST, DTOs, entidades, validação, i18n, logs estruturados.
+    - Para equivalência Delphi → Java/React, veja MATRIZ_EQUIVALENCIA.md.
+    - Para exemplos de uso, consulte a coleção Postman/Insomnia.
+  version: "1.0.0"
+  contact:
+    name: Intercred Modernization Team
+    email: suporte@intercred.com.br
+    url: https://github.com/intercred-modernization
+servers:
+  - url: http://localhost:8080
+    description: Local DEV
+  - url: https://api.intercred.com.br
+    description: Produção
+
+tags:
+  - name: ContratoCapitalGiro
+    description: Contratos de Capital de Giro
+  - name: Emprestimo
+    description: Empréstimos
+  - name: SimulacaoEmprestimo
+    description: Simulação de Empréstimo
+  - name: Auth
+    description: Autenticação e Usuário
+
+paths:
+  /api/contrato-capital-giro:
+    get:
+      tags: [ContratoCapitalGiro]
+      summary: Listar contratos de capital de giro
+      operationId: listContratosCapitalGiro
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0 }
+          description: Página para paginação
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1 }
+          description: Tamanho da página
+      responses:
+        '200':
+          description: Lista de contratos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContratoCapitalGiro'
+    post:
+      tags: [ContratoCapitalGiro]
+      summary: Criar novo contrato de capital de giro
+      operationId: createContratoCapitalGiro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoCapitalGiroCreate'
+      responses:
+        '201':
+          description: Contrato criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoCapitalGiro'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/contrato-capital-giro/{id}:
+    get:
+      tags: [ContratoCapitalGiro]
+      summary: Buscar contrato de capital de giro por ID
+      operationId: getContratoCapitalGiro
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Contrato encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoCapitalGiro'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [ContratoCapitalGiro]
+      summary: Atualizar contrato de capital de giro
+      operationId: updateContratoCapitalGiro
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContratoCapitalGiroUpdate'
+      responses:
+        '200':
+          description: Contrato atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContratoCapitalGiro'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [ContratoCapitalGiro]
+      summary: Excluir contrato de capital de giro
+      operationId: deleteContratoCapitalGiro
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Contrato excluído
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/emprestimos:
+    get:
+      tags: [Emprestimo]
+      summary: Listar empréstimos
+      operationId: listEmprestimos
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Lista de empréstimos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Emprestimo'
+    post:
+      tags: [Emprestimo]
+      summary: Criar novo empréstimo
+      operationId: createEmprestimo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmprestimoCreate'
+      responses:
+        '201':
+          description: Empréstimo criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emprestimo'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/emprestimos/{id}:
+    get:
+      tags: [Emprestimo]
+      summary: Buscar empréstimo por ID
+      operationId: getEmprestimo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Empréstimo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emprestimo'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Emprestimo]
+      summary: Atualizar empréstimo
+      operationId: updateEmprestimo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmprestimoUpdate'
+      responses:
+        '200':
+          description: Empréstimo atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emprestimo'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Emprestimo]
+      summary: Excluir empréstimo
+      operationId: deleteEmprestimo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Empréstimo excluído
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/simulacao-emprestimo:
+    get:
+      tags: [SimulacaoEmprestimo]
+      summary: Listar simulações de empréstimo
+      operationId: listSimulacaoEmprestimo
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Lista de simulações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SimulacaoEmprestimo'
+    post:
+      tags: [SimulacaoEmprestimo]
+      summary: Criar nova simulação de empréstimo
+      operationId: createSimulacaoEmprestimo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulacaoEmprestimoCreate'
+      responses:
+        '201':
+          description: Simulação criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulacaoEmprestimo'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+  /api/simulacao-emprestimo/{id}:
+    get:
+      tags: [SimulacaoEmprestimo]
+      summary: Buscar simulação de empréstimo por ID
+      operationId: getSimulacaoEmprestimo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Simulação encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulacaoEmprestimo'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [SimulacaoEmprestimo]
+      summary: Atualizar simulação de empréstimo
+      operationId: updateSimulacaoEmprestimo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulacaoEmprestimoUpdate'
+      responses:
+        '200':
+          description: Simulação atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimulacaoEmprestimo'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [SimulacaoEmprestimo]
+      summary: Excluir simulação de empréstimo
+      operationId: deleteSimulacaoEmprestimo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Simulação excluída
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Autenticar usuário (login)
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required: [username, password]
+      responses:
+        '200':
+          description: Autenticado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Obter perfil do usuário autenticado
+      operationId: getMe
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil do usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    ValidationError:
+      description: Erro de validação
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Recurso não encontrado
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: Não autorizado
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+
+  schemas:
+    ContratoCapitalGiro:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        numeroContrato:
+          type: string
+          example: "12345"
+        cedenteId:
+          type: integer
+          example: 10
+        cedenteNome:
+          type: string
+          example: "Empresa ABC"
+        produtoId:
+          type: integer
+          example: 20
+        produtoNome:
+          type: string
+          example: "Capital de Giro"
+        dataOperacao:
+          type: string
+          format: date
+          example: "2024-06-01"
+        valorReferencia:
+          type: number
+          format: double
+          example: 1000.00
+        valorFinanciado:
+          type: number
+          format: double
+          example: 900.00
+        valorLiquido:
+          type: number
+          format: double
+          example: 850.00
+        taxaMes:
+          type: number
+          format: double
+          example: 2.5
+        taxaEfetiva:
+          type: number
+          format: double
+          example: 2.7
+        taxaIOF:
+          type: number
+          format: double
+          example: 0.38
+        taxaIOFComplementar:
+          type: number
+          format: double
+          example: 0.38
+        valorIOF:
+          type: number
+          format: double
+          example: 10.00
+        valorIOFComplementar:
+          type: number
+          format: double
+          example: 2.00
+        valorTac:
+          type: number
+          format: double
+          example: 5.00
+        valorCustoCobranca:
+          type: number
+          format: double
+          example: 3.00
+        valorDoc:
+          type: number
+          format: double
+          example: 1.00
+        valorCustoAdministrativo:
+          type: number
+          format: double
+          example: 2.00
+        valorOutrasDespesas:
+          type: number
+          format: double
+          example: 4.00
+        taxaAberturaCredito:
+          type: number
+          format: double
+          example: 0.5
+        totalParcelas:
+          type: integer
+          example: 12
+        dataPrimeiraParcela:
+          type: string
+          format: date
+          example: "2024-07-01"
+        diasCarencia:
+          type: integer
+          example: 0
+        parcelasCarencia:
+          type: integer
+          example: 0
+        tipoPagtoIOF:
+          type: string
+          example: "F"
+        tipoPagtoTac:
+          type: string
+          example: "F"
+        tipoContrato:
+          type: string
+          example: "N"
+        status:
+          type: string
+          example: "ABERTO"
+        usuarioComercial:
+          type: string
+          example: "jose"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - numeroContrato
+        - cedenteId
+        - produtoId
+        - dataOperacao
+        - valorReferencia
+        - valorFinanciado
+        - valorLiquido
+        - taxaMes
+        - taxaEfetiva
+        - taxaIOF
+        - taxaIOFComplementar
+        - valorIOF
+        - valorIOFComplementar
+        - valorTac
+        - valorCustoCobranca
+        - valorDoc
+        - valorCustoAdministrativo
+        - valorOutrasDespesas
+        - taxaAberturaCredito
+        - totalParcelas
+        - dataPrimeiraParcela
+        - diasCarencia
+        - parcelasCarencia
+        - tipoPagtoIOF
+        - tipoPagtoTac
+        - tipoContrato
+
+    ContratoCapitalGiroCreate:
+      allOf:
+        - $ref: '#/components/schemas/ContratoCapitalGiro'
+      required:
+        - numeroContrato
+        - cedenteId
+        - produtoId
+        - dataOperacao
+        - valorReferencia
+        - valorFinanciado
+        - valorLiquido
+        - taxaMes
+        - taxaEfetiva
+        - taxaIOF
+        - taxaIOFComplementar
+        - valorIOF
+        - valorIOFComplementar
+        - valorTac
+        - valorCustoCobranca
+        - valorDoc
+        - valorCustoAdministrativo
+        - valorOutrasDespesas
+        - taxaAberturaCredito
+        - totalParcelas
+        - dataPrimeiraParcela
+        - diasCarencia
+        - parcelasCarencia
+        - tipoPagtoIOF
+        - tipoPagtoTac
+        - tipoContrato
+
+    ContratoCapitalGiroUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ContratoCapitalGiro'
+
+    Emprestimo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        numeroContrato:
+          type: string
+          example: "EMP-001"
+        cedenteId:
+          type: integer
+          example: 10
+        cedenteNome:
+          type: string
+          example: "Empresa ABC"
+        produtoId:
+          type: integer
+          example: 20
+        produtoNome:
+          type: string
+          example: "Empréstimo"
+        dataOperacao:
+          type: string
+          format: date
+          example: "2024-06-01"
+        valorReferencia:
+          type: number
+          format: double
+          example: 1000.00
+        valorFinanciado:
+          type: number
+          format: double
+          example: 900.00
+        valorLiquido:
+          type: number
+          format: double
+          example: 850.00
+        taxaMes:
+          type: number
+          format: double
+          example: 2.5
+        taxaEfetiva:
+          type: number
+          format: double
+          example: 2.7
+        taxaIOF:
+          type: number
+          format: double
+          example: 0.38
+        taxaIOFComplementar:
+          type: number
+          format: double
+          example: 0.38
+        valorIOF:
+          type: number
+          format: double
+          example: 10.00
+        valorIOFComplementar:
+          type: number
+          format: double
+          example: 2.00
+        valorTac:
+          type: number
+          format: double
+          example: 5.00
+        valorCustoCobranca:
+          type: number
+          format: double
+          example: 3.00
+        valorDoc:
+          type: number
+          format: double
+          example: 1.00
+        valorCustoAdministrativo:
+          type: number
+          format: double
+          example: 2.00
+        valorOutrasDespesas:
+          type: number
+          format: double
+          example: 4.00
+        taxaAberturaCredito:
+          type: number
+          format: double
+          example: 0.5
+        totalParcelas:
+          type: integer
+          example: 12
+        dataPrimeiraParcela:
+          type: string
+          format: date
+          example: "2024-07-01"
+        diasCarencia:
+          type: integer
+          example: 0
+        parcelasCarencia:
+          type: integer
+          example: 0
+        tipoPagtoIOF:
+          type: string
+          example: "F"
+        tipoPagtoTac:
+          type: string
+          example: "F"
+        tipoContrato:
+          type: string
+          example: "N"
+        status:
+          type: string
+          example: "ABERTO"
+        usuarioComercial:
+          type: string
+          example: "jose"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - numeroContrato
+        - cedenteId
+        - produtoId
+        - dataOperacao
+        - valorReferencia
+        - valorFinanciado
+        - valorLiquido
+        - taxaMes
+        - taxaEfetiva
+        - taxaIOF
+        - taxaIOFComplementar
+        - valorIOF
+        - valorIOFComplementar
+        - valorTac
+        - valorCustoCobranca
+        - valorDoc
+        - valorCustoAdministrativo
+        - valorOutrasDespesas
+        - taxaAberturaCredito
+        - totalParcelas
+        - dataPrimeiraParcela
+        - diasCarencia
+        - parcelasCarencia
+        - tipoPagtoIOF
+        - tipoPagtoTac
+        - tipoContrato
+
+    EmprestimoCreate:
+      allOf:
+        - $ref: '#/components/schemas/Emprestimo'
+      required:
+        - numeroContrato
+        - cedenteId
+        - produtoId
+        - dataOperacao
+        - valorReferencia
+        - valorFinanciado
+        - valorLiquido
+        - taxaMes
+        - taxaEfetiva
+        - taxaIOF
+        - taxaIOFComplementar
+        - valorIOF
+        - valorIOFComplementar
+        - valorTac
+        - valorCustoCobranca
+        - valorDoc
+        - valorCustoAdministrativo
+        - valorOutrasDespesas
+        - taxaAberturaCredito
+        - totalParcelas
+        - dataPrimeiraParcela
+        - diasCarencia
+        - parcelasCarencia
+        - tipoPagtoIOF
+        - tipoPagtoTac
+        - tipoContrato
+
+    EmprestimoUpdate:
+      allOf:
+        - $ref: '#/components/schemas/Emprestimo'
+
+    SimulacaoEmprestimo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        numeroSimulacao:
+          type: string
+          example: "SIM-001"
+        cedenteId:
+          type: integer
+          example: 10
+        cedenteNome:
+          type: string
+          example: "Empresa ABC"
+        produtoId:
+          type: integer
+          example: 20
+        produtoNome:
+          type: string
+          example: "Simulação"
+        dataOperacao:
+          type: string
+          format: date
+          example: "2024-06-01"
+        valorReferencia:
+          type: number
+          format: double
+          example: 1000.00
+        valorFinanciado:
+          type: number
+          format: double
+          example: 900.00
+        valorLiquido:
+          type: number
+          format: double
+          example: 850.00
+        taxaMes:
+          type: number
+          format: double
+          example: 2.5
+        taxaEfetiva:
+          type: number
+          format: double
+          example: 2.7
+        taxaIOF:
+          type: number
+          format: double
+          example: 0.38
+        taxaIOFComplementar:
+          type: number
+          format: double
+          example: 0.38
+        valorIOF:
+          type: number
+          format: double
+          example: 10.00
+        valorIOFComplementar:
+          type: number
+          format: double
+          example: 2.00
+        valorTac:
+          type: number
+          format: double
+          example: 5.00
+        valorCustoCobranca:
+          type: number
+          format: double
+          example: 3.00
+        valorDoc:
+          type: number
+          format: double
+          example: 1.00
+        valorCustoAdministrativo:
+          type: number
+          format: double
+          example: 2.00
+        valorOutrasDespesas:
+          type: number
+          format: double
+          example: 4.00
+        taxaAberturaCredito:
+          type: number
+          format: double
+          example: 0.5
+        totalParcelas:
+          type: integer
+          example: 12
+        dataPrimeiraParcela:
+          type: string
+          format: date
+          example: "2024-07-01"
+        diasCarencia:
+          type: integer
+          example: 0
+        parcelasCarencia:
+          type: integer
+          example: 0
+        tipoPagtoIOF:
+          type: string
+          example: "F"
+        tipoPagtoTac:
+          type: string
+          example: "F"
+        tipoContrato:
+          type: string
+          example: "N"
+        status:
+          type: string
+          example: "ABERTO"
+        usuarioComercial:
+          type: string
+          example: "jose"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - numeroSimulacao
+        - cedenteId
+        - produtoId
+        - dataOperacao
+        - valorReferencia
+        - valorFinanciado
+        - valorLiquido
+        - taxaMes
+        - taxaEfetiva
+        - taxaIOF
+        - taxaIOFComplementar
+        - valorIOF
+        - valorIOFComplementar
+        - valorTac
+        - valorCustoCobranca
+        - valorDoc
+        - valorCustoAdministrativo
+        - valorOutrasDespesas
+        - taxaAberturaCredito
+        - totalParcelas
+        - dataPrimeiraParcela
+        - diasCarencia
+        - parcelasCarencia
+        - tipoPagtoIOF
+        - tipoPagtoTac
+        - tipoContrato
+
+    SimulacaoEmprestimoCreate:
+      allOf:
+        - $ref: '#/components/schemas/SimulacaoEmprestimo'
+      required:
+        - numeroSimulacao
+        - cedenteId
+        - produtoId
+        - dataOperacao
+        - valorReferencia
+        - valorFinanciado
+        - valorLiquido
+        - taxaMes
+        - taxaEfetiva
+        - taxaIOF
+        - taxaIOFComplementar
+        - valorIOF
+        - valorIOFComplementar
+        - valorTac
+        - valorCustoCobranca
+        - valorDoc
+        - valorCustoAdministrativo
+        - valorOutrasDespesas
+        - taxaAberturaCredito
+        - totalParcelas
+        - dataPrimeiraParcela
+        - diasCarencia
+        - parcelasCarencia
+        - tipoPagtoIOF
+        - tipoPagtoTac
+        - tipoContrato
+
+    SimulacaoEmprestimoUpdate:
+      allOf:
+        - $ref: '#/components/schemas/SimulacaoEmprestimo'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        username:
+          type: string
+          example: "jose"
+        roles:
+          type: array
+          items:
+            type: string
+          example: ["USER", "ADMIN"]
+        email:
+          type: string
+          example: "jose@intercred.com.br"
+        nome:
+          type: string
+          example: "José da Silva"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "https://intercred.com.br/problem/validation"
+        title:
+          type: string
+          example: "Erro de validação"
+        status:
+          type: integer
+          example: 400
+        detail:
+          type: string
+          example: "Um ou mais campos estão inválidos. Corrija e tente novamente."
+        instance:
+          type: string
+          example: "/api/contrato-capital-giro"
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+externalDocs:
+  description: Documentação de migração, matriz de equivalência e exemplos de uso
+  url: https://github.com/intercred-modernization
+
+x-generated-by: "Intercred Modernization - OpenAPI Generator"
+x-migration-notes: |
+  - Delphi Forms/Actions → React pages/components (ver MATRIZ_EQUIVALENCIA.md)
+  - DataModules/Queries → Spring Data JPA + Service
+  - Validação: Bean Validation + i18n
+  - Erros: RFC7807 Problem Details
+  - Testes: JUnit5 + Testcontainers (backend), Vitest (frontend)
+  - Build: mvn clean verify (backend), npm run build (frontend)
+  - Infra: Dockerfiles, docker-compose, env/.env.example
+  - Para dúvidas, consulte README.md e documentação de migração
+
+x-equivalence-matrix: MATRIZ_EQUIVALENCIA.md
+x-postman-collection: POSTMAN_COLLECTION.json
+x-readme: README.md
+
+# Fim do arquivo swagger.yaml
